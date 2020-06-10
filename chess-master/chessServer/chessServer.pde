@@ -29,6 +29,10 @@ char board[][] = {
 ArrayList<char[][]> positions;
 
 boolean pawnIsPromoting;
+int promotionRow;
+int promotionCol;
+
+char promoteTo;
 
 void setup() {
   size(800, 800);
@@ -56,7 +60,7 @@ void setup() {
 
 void draw() {
   drawBoard();
-  
+
   drawPieces();
   receiveMove();
   highlightLegalMoves(row1, col1);
@@ -82,6 +86,23 @@ void draw() {
   fill(0);
   textSize(20);
   text(blackTimer/60 +":" + blackTimer%60/10 + blackTimer%60%10, 720, 15);
+
+  if (pawnIsPromoting) {
+    fill(0, 180);
+    rect(0, 0, 800, 800);
+
+    if (row2 == 0) {
+      image(wqueen, 0, 0, 400, 400);
+      image(wknight, 400, 0, 400, 400);
+      image(wbishop, 0, 400, 400, 400);
+      image(wrook, 400, 400, 400, 400);
+    } else if (row2 == 7) {
+      image(bqueen, 0, 0, 400, 400);
+      image(bknight, 400, 0, 400, 400);
+      image(bbishop, 0, 400, 400, 400);
+      image(brook, 400, 400, 400, 400);
+    }
+  }
 }
 
 void drawBoard() {
@@ -137,7 +158,12 @@ void receiveMove() {
       positions.remove(positions.size()-1);
       whiteTurn = !whiteTurn;
     }
+      //Recieve promotion move
+      if (incoming.substring(0, 1).equals("p")) {
+        board[int(incoming.substring(1, 2))][int(incoming.substring(3, 4))] = incoming.charAt(5);
+      }
 
+    //Recieve move
     if (incoming.substring(0, 1).equals("m")) {
 
       //make the move
@@ -146,7 +172,7 @@ void receiveMove() {
       int r2 = int(incoming.substring(5, 6));
       int c2 = int(incoming.substring(7, 8));
 
-      //en passent exception
+      //en passent move
       if (board[r1][c1] == 'p' && board[r2][c2] == ' ' && Math.abs(c1-c2) ==1) {
         board[r1][c2] = ' ';
       }
@@ -168,6 +194,7 @@ void receiveMove() {
         board[0][3] = board[0][0];
         board[0][0] = ' ';
       }
+
       //normal move
       board[r2][c2] = board[r1][c1];
       board[r1][c1] = ' ';
@@ -199,63 +226,90 @@ void highlightLegalMoves(int row, int col) {
 }
 
 void mouseReleased() {
-
-  if (whiteTurn) {
-    if (firstClick) {
-      row1 = mouseY/100;
-      col1 = mouseX/100;
-      firstClick = false;
-    } else {
-      row2 = mouseY/100;
-      col2 = mouseX/100;
-      if (checkLegal(row1, col1, row2, col2) && whitePieces.contains(str(board[row1][col1]))) {
-
-        //en passent exception
-        if (board[row1][col1] == 'P' && board[row2][col2] == ' ' && Math.abs(col1-col2) ==1) {
-          board[row1][col2] = ' ';
-        }
-
-        //check if move affects castling priveleges
-        if (row1 == 7 && col1==0)
-          whiteCanCastleQueenSide = false;
-        else if (row1 == 7 && col1 == 7)
-          whiteCanCastleKingSide = false;
-        else if (row1 == 7 && col1 ==4) {
-          whiteCanCastleKingSide = false;
-          whiteCanCastleQueenSide = false;
-        }
-
-        //castling exception
-        if (board[row1][col1] == 'K' && col2-col1 == 2) {
-          board[7][5] = board[7][7];
-          board[7][7] = ' ';
-        } else if (board[row1][col1] == 'K' && col2-col1 == -2) {
-          board[7][3] = board[7][0];
-          board[7][0] = ' ';
-        }
-
-
-        //normal move
-        board[row2][col2] = board[row1][col1];
-        board[row1][col1] = ' ';
-        myServer.write("m" +row1+"," +col1+"," + row2 +"," +col2);
-        whiteTurn = false;
-        firstClick = true;
-
-
-        //record the position
-        char[][] temp = new char[8][8];
-        for (int i = 0; i < 8; i++)
-          for (int j = 0; j < 8; j++)
-            temp[i][j]=board[i][j];
-        positions.add(temp);
-      } else {
-        firstClick = true;
+  if (!pawnIsPromoting) {
+    if (whiteTurn) {
+      if (firstClick) {
         row1 = mouseY/100;
         col1 = mouseX/100;
         firstClick = false;
+      } else {
+        row2 = mouseY/100;
+        col2 = mouseX/100;
+        if (checkLegal(row1, col1, row2, col2) && whitePieces.contains(str(board[row1][col1]))) {
+
+          //en passent exception
+          if (board[row1][col1] == 'P' && board[row2][col2] == ' ' && Math.abs(col1-col2) ==1) {
+            board[row1][col2] = ' ';
+          }
+
+          //check if move affects castling priveleges
+          if (row1 == 7 && col1==0)
+            whiteCanCastleQueenSide = false;
+          else if (row1 == 7 && col1 == 7)
+            whiteCanCastleKingSide = false;
+          else if (row1 == 7 && col1 ==4) {
+            whiteCanCastleKingSide = false;
+            whiteCanCastleQueenSide = false;
+          }
+
+          //castling exception
+          if (board[row1][col1] == 'K' && col2-col1 == 2) {
+            board[7][5] = board[7][7];
+            board[7][7] = ' ';
+          } else if (board[row1][col1] == 'K' && col2-col1 == -2) {
+            board[7][3] = board[7][0];
+            board[7][0] = ' ';
+          }
+
+          //pawn promotion move
+          if ((board[row1][col1] == 'p' && row2== 7) || (board[row1][col1] == 'P' && row2== 0)) {
+            pawnIsPromoting = true;
+            promotionRow = row2;
+            promotionCol = col2;
+          }
+
+          //normal move
+          board[row2][col2] = board[row1][col1];
+          board[row1][col1] = ' ';
+          myServer.write("m" +row1+"," +col1+"," + row2 +"," +col2);
+          whiteTurn = false;
+          firstClick = true;
+
+
+          //record the position
+          char[][] temp = new char[8][8];
+          for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
+              temp[i][j]=board[i][j];
+          positions.add(temp);
+        } else {
+          firstClick = true;
+          row1 = mouseY/100;
+          col1 = mouseX/100;
+          firstClick = false;
+        }
       }
     }
+  } else {
+
+
+    //PROMOTE PAWN
+    if (mouseX <400 && mouseX < 400) {
+      board[promotionRow][promotionCol] = row2 == 0? 'Q' : 'q';
+      promoteTo = row2 == 0? 'Q' : 'q';
+    } else if (mouseX > 400 && mouseY<400) {
+      board[promotionRow][promotionCol] = row2 == 0? 'N' : 'n';
+      promoteTo = row2 == 0? 'N' : 'n';
+    } else if (mouseX < 400 && mouseY>400) {
+      board[promotionRow][promotionCol] = row2 == 0? 'B' : 'b';
+      promoteTo = row2 == 0? 'B' : 'b';
+    } else if (mouseX > 400 && mouseY > 400) {
+      board[promotionRow][promotionCol] = row2 == 0? 'R' : 'r'; 
+      promoteTo = row2 == 0? 'R' : 'r';
+    }
+
+    myServer.write("p" + row2 + "," + col2 + "," + promoteTo);
+    pawnIsPromoting = false;
   }
 }
 

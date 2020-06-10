@@ -224,7 +224,7 @@ boolean checkLegal(int r1, int c1, int r2, int c2) {
     boolean ans = true;
     if (board[r2][c2] == ' ') {
       if ((r2 - r1 == 1 && c2== c1) 
-        || (r2-r1 == 2 && r1==1 && c2==c1&& board[3][c1] == ' ')) {
+        || (r2-r1 == 2 && r1==1 && c2==c1&& board[2][c1] == ' ')) {
         ans =true;
       } else if ( c1 !=7 && r1==4 && board[r1][c1+1] == 'P' && board[6][c1+1] == ' ' &&  positions.get(positions.size()-2)[6][c1+1] == 'P' &&positions.get(positions.size()-2)[4][c1+1] == ' ' && c2-c1 == 1 && r2-r1 ==1) {
         ans = true;
