@@ -1,9 +1,17 @@
-  String blackPieces = "rnbqkp";
+String blackPieces = "rnbqkp";
 String whitePieces = "RNBQKP";
 
 boolean checkLegal(int r1, int c1, int r2, int c2) {
-  if ((r2 == r1 && c2 == c1)) return false;
-  if (blackPieces.contains(str(board[r2][c2]))&& blackPieces.contains(str(board[row1][col1]))) return false;
+
+  //obvious conditions
+  if ((r2 == r1 && c2 == c1)) 
+    return false;
+
+  if (whitePieces.contains(str(board[r2][c2])) && whitePieces.contains(str(board[r1][c1]))) 
+    return false;
+
+  if (blackPieces.contains(str(board[r2][c2])) &&blackPieces.contains(str(board[r1][c1])) )
+    return false;
 
   //ROOK===============================================================
   if (board[r1][c1] == 'R' || board[r1][c1] == 'r') {
@@ -180,17 +188,16 @@ boolean checkLegal(int r1, int c1, int r2, int c2) {
   if (board[r1][c1] == 'k' || board[r1][c1] == 'K') {
     if (((r2 - r1 == 0 || c2-c1 == 0) && Math.abs(r2-r1+c2-c1) == 1)|| (Math.abs(r2-r1) == Math.abs(c2-c1) && Math.abs(r2-r1)==1) ) 
       return true;
-    else if(board[r1][c1] == 'K' && whiteCanCastleKingSide && r2==7 && c2 == 6 && !blackAttacking(7, 4) && !blackAttacking(7,5) && !blackAttacking (7, 6)){
+    else if (board[r1][c1] == 'K' && whiteCanCastleKingSide && r2==7 && c2 == 6 && !blackAttacking(7, 4) && !blackAttacking(7, 5) && !blackAttacking (7, 6)) {
       return true;
-    } else if(board[r1][c1] == 'K' && whiteCanCastleQueenSide && r2==7 && c2 == 2&& !blackAttacking(7, 4) && !blackAttacking(7,3) && !blackAttacking (7, 2)){
+    } else if (board[r1][c1] == 'K' && whiteCanCastleQueenSide && r2==7 && c2 == 2&& !blackAttacking(7, 4) && !blackAttacking(7, 3) && !blackAttacking (7, 2)) {
       return true;
-      
-    }else if(board[r1][c1] == 'k' && blackCanCastleKingSide && r2 == 0 && c2 == 6&& !whiteAttacking(0, 4) && !whiteAttacking(0,5) && !whiteAttacking (0, 6)){
+    } else if (board[r1][c1] == 'k' && blackCanCastleKingSide && r2 == 0 && c2 == 6&& !whiteAttacking(0, 4) && !whiteAttacking(0, 5) && !whiteAttacking (0, 6)) {
       return true;
-    }else if(board[r1][c1] == 'k' &&  blackCanCastleQueenSide && r2 == 0 && c2 == 2&& !whiteAttacking(0, 4) && !whiteAttacking(0,3) && !whiteAttacking (0, 2)){
+    } else if (board[r1][c1] == 'k' &&  blackCanCastleQueenSide && r2 == 0 && c2 == 2&& !whiteAttacking(0, 4) && !whiteAttacking(0, 3) && !whiteAttacking (0, 2)) {
       return true;
-    }else 
-      return false;
+    } else 
+    return false;
   }
 
 
@@ -236,22 +243,22 @@ boolean checkLegal(int r1, int c1, int r2, int c2) {
   return false;
 }
 
-boolean whiteAttacking(int r, int c){
-  
-  for(int i = 0; i < 8; i++){
-    for(int j =0; j < 8; j++){
-      if(whitePieces.contains(str(board[i][j])) && checkLegal(i, j, r, c))
+boolean whiteAttacking(int r, int c) {
+
+  for (int i = 0; i < 8; i++) {
+    for (int j =0; j < 8; j++) {
+      if (whitePieces.contains(str(board[i][j])) && checkLegal(i, j, r, c))
         return true;
     }
   }
   return false;
 }
 
-boolean blackAttacking(int r, int c){
-  
-  for(int i = 0; i < 8; i++){
-    for(int j =0; j < 8; j++){
-      if(blackPieces.contains(str(board[i][j])) && checkLegal(i, j, r, c))
+boolean blackAttacking(int r, int c) {
+
+  for (int i = 0; i < 8; i++) {
+    for (int j =0; j < 8; j++) {
+      if (blackPieces.contains(str(board[i][j])) && checkLegal(i, j, r, c))
         return true;
     }
   }

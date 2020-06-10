@@ -28,6 +28,7 @@ char board[][] = {
 };
 ArrayList<char[][]> positions;
 
+boolean pawnIsPromoting;
 
 void setup() {
   size(800, 800);
@@ -54,8 +55,8 @@ void setup() {
 }
 
 void draw() {
-println(blackAttacking(7, 4));
   drawBoard();
+  
   drawPieces();
   receiveMove();
   highlightLegalMoves(row1, col1);

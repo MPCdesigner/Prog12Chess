@@ -151,16 +151,16 @@ void receiveMove() {
         whiteCanCastleKingSide = false;
         whiteCanCastleQueenSide = false;
       }
-      
-        //castling exception
-        if(board[r1][c1] == 'K' && c2-c1 == 2){
-          board[7][5] = board[7][7];
-          board[7][7] = ' ';
-        } else if(board[r1][c1] == 'K' && c2-c1 == -2){
-          board[7][3] = board[7][0];
-          board[7][0] = ' ';
-        }
-      
+
+      //castling exception
+      if (board[r1][c1] == 'K' && c2-c1 == 2) {
+        board[7][5] = board[7][7];
+        board[7][7] = ' ';
+      } else if (board[r1][c1] == 'K' && c2-c1 == -2) {
+        board[7][3] = board[7][0];
+        board[7][0] = ' ';
+      }
+
       //normal move
       board[r2][c2] = board[r1][c1];
       board[r1][c1] = ' ';
@@ -183,7 +183,7 @@ void mouseReleased() {
     } else {
       row2 = mouseY/100;
       col2 = mouseX/100;
-      if (checkLegal(row1, col1, row2, col2)) {
+      if (checkLegal(row1, col1, row2, col2)&& blackPieces.contains(str(board[row1][col1]))) {
 
         //en passent exception
         if (board[row1][col1] == 'p' && board[row2][col2] == ' ' && Math.abs(col1-col2) ==1) {
@@ -201,10 +201,10 @@ void mouseReleased() {
         }
 
         //castling exception
-        if(board[row1][col1] == 'k' && col2-col1 == 2){
+        if (board[row1][col1] == 'k' && col2-col1 == 2) {
           board[0][5] = board[0][7];
           board[0][7] = ' ';
-        } else if(board[row1][col1] == 'k' && col2-col1 == -2){
+        } else if (board[row1][col1] == 'k' && col2-col1 == -2) {
           board[0][3] = board[0][0];
           board[0][0] = ' ';
         }
