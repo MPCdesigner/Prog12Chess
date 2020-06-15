@@ -1,3 +1,49 @@
+/*
+
+Chess Program:
+
+Features added:
+-Enforces turn taking
+    - The server is always white and client is always black
+    
+-Enforces and highlights legal moves including:
+    - regular moves
+    - en passent
+    - castling
+    - pawn promotion
+    - check-related legal moves 
+    (you cannot make a move that puts your king in check)
+    
+-Has a timer (but nothing happens when you time out)
+
+-Use LEFT arrow to undo moves
+
+
+Features not added:
+-THE PROGRAM DOES NOT RECOGNIZE CHECKMATE
+-Does not check for draw conditions 
+(threefold repetition, insufficient material, 50-move rule etc.)
+
+Bugs:
+
+-Sometimes, the program completely stops responding after some moves
+
+-Occasionally, a move doesn't register if you move too fast
+
+-Bug with castling and undo move: if you move your king, you lose your
+castling priveleges. However, if you undo that move, you don't regain your 
+castling priveleges. i.e. you cannot castle when you should be able to.
+  --> a way to fix this is to make a position object which stores not only
+  a char[][] of the position but also has an instance variable storing the
+  castling priveliges of that position. That way, you can restore the castling 
+  priveleges when you undo move.
+
+-One second on the timer is not exactly one second in real life
+
+*/
+
+
+
 import processing.net.*;
 color lightbrown = #FFFFC3;
 color darkbrown  = #D8864E;
@@ -33,6 +79,7 @@ int promotionRow;
 int promotionCol;
 
 char promoteTo;
+
 
 void setup() {
   size(800, 800);
@@ -200,7 +247,6 @@ void receiveMove() {
       board[r1][c1] = ' ';
       whiteTurn = true;
 
-
       //record the position
       char[][] temp = new char[8][8];
       for (int i = 0; i < 8; i++)
@@ -215,7 +261,7 @@ void highlightLegalMoves(int row, int col) {
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
 
-      if (checkLegal(row, col, i, j)&& whitePieces.contains(str(board[row1][col1]))) {
+      if (checkLegal(board, row, col, i, j)&& checkWhiteKingSafety(row, col, i, j)&& whitePieces.contains(str(board[row1][col1]))) {
         fill(255, 255, 0, 150);
         stroke(0);
         strokeWeight(0);
@@ -235,7 +281,7 @@ void mouseReleased() {
       } else {
         row2 = mouseY/100;
         col2 = mouseX/100;
-        if (checkLegal(row1, col1, row2, col2) && whitePieces.contains(str(board[row1][col1]))) {
+        if (checkLegal(board, row1, col1, row2, col2) && checkWhiteKingSafety(row1, col1, row2, col2) && whitePieces.contains(str(board[row1][col1]))) {
 
           //en passent exception
           if (board[row1][col1] == 'P' && board[row2][col2] == ' ' && Math.abs(col1-col2) ==1) {

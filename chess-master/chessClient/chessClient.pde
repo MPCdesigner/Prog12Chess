@@ -32,6 +32,8 @@ int promotionRow;
 int promotionCol;
 
 char promoteTo;
+
+
 void setup() {
   size(800, 800);
 
@@ -57,6 +59,7 @@ void setup() {
 }
 
 void draw() {
+  println(whiteTurn);
   drawBoard();
   drawPieces();
   receiveMove();
@@ -191,6 +194,8 @@ void receiveMove() {
       board[r2][c2] = board[r1][c1];
       board[r1][c1] = ' ';
       whiteTurn = false;
+
+      
       //record the position
       char[][] temp = new char[8][8];
       for (int i = 0; i < 8; i++)
@@ -210,8 +215,8 @@ void mouseReleased() {
       } else {
         row2 = mouseY/100;
         col2 = mouseX/100;
-        if (checkLegal(row1, col1, row2, col2)&& blackPieces.contains(str(board[row1][col1]))) {
-
+        if (checkLegal(board, row1, col1, row2, col2)&& checkBlackKingSafety(row1, col1, row2, col2)&& blackPieces.contains(str(board[row1][col1]))) {
+ 
           //en passent exception
           if (board[row1][col1] == 'p' && board[row2][col2] == ' ' && Math.abs(col1-col2) ==1) {
             board[row1][col2] = ' ';
@@ -248,6 +253,7 @@ void mouseReleased() {
           board[row2][col2] = board[row1][col1];
           board[row1][col1] = ' ';
           myClient.write("m" + row1+"," +col1+"," + row2 +"," +col2);
+          whiteTurn = true;
           firstClick = true;
 
           //record the position
@@ -287,7 +293,7 @@ void mouseReleased() {
 void highlightLegalMoves(int r1, int c1) {
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
-      if (checkLegal(r1, c1, i, j)&& blackPieces.contains(str(board[row1][col1]))) {
+      if (checkLegal(board, r1, c1, i, j)&& checkBlackKingSafety(r1, c1, i, j)&& blackPieces.contains(str(board[row1][col1]))) {
         fill(255, 255, 0, 150);
         stroke(0);
         strokeWeight(0);
